@@ -1,0 +1,40 @@
+server:
+  port: 8080
+#logging:
+#  config: classpath:log4j2.xml
+spring:
+  datasource:
+    druid:
+      name: mysql
+      url: jdbc:mysql://118.25.25.185:3306/appm?serverTimezone=GMT%2B8
+      username: root
+      password: jiapeng89
+      driver-class-name: com.mysql.jdbc.Driver
+      filters: stat
+      maxActive: 20
+      initialSize: 1
+      maxWait: 60000
+      minIdle: 1
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      testWhileIdle: true
+      validationQuery: select 'x'
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      maxOpenPreparedStatements: 20
+  mvc:
+    #当出现 404 错误时, 直接抛出异常
+    throw-exception-if-no-handler-found: true
+    #静态资源的映射
+    static-path-pattern: /static/**
+  thymeleaf:
+    cache: false
+    check-template-location: true
+    servlet:
+      content-type: text/html
+    enabled: true
+    encoding: UTF-8
+    mode: HTML
+    prefix: classpath:templates/
+    suffix: .html
