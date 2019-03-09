@@ -1,0 +1,47 @@
+[
+	{
+      "text": "管理员",
+		"id": 1,
+        "nodes": [{
+            "text": "admin",
+            "nodes": [
+              {"text": "user1","id": 2},
+              {"text": "user 2","id": 3}
+            ]
+          },
+          {"text": "总经理","id": 4}
+        ]
+	},
+   {"text": "业务",
+	   "id": 5,
+	  	"nodes": [{
+	        "text": "主管",
+			"id": 6,
+	        "nodes": [
+	          {"text": "小组 1","id": 7},
+	          {"text": "小组 2","id": 8}
+	        ]
+	    },
+	    {"text": "销售","id": 9}
+	    ]
+   },
+   {"text": "广州公司",
+	   "id": 10,
+	  	"nodes": [{
+	        "text": "主管",
+			"id": 11,
+	        "nodes": [
+	          {"text": "小组 1","id": 12},
+	          {"text": "小组 2","id": 13}
+	        ]
+	    },
+	    {"text": "天河点","id": 14}
+	    ]
+   },
+   {"text": "财务","id": 15},
+	{
+		"text": "IT技术",
+		"id": 16,
+		"state":{"checked": true}
+	}
+]

@@ -1,0 +1,18 @@
+{
+	"pageIndex":1,
+	"pageSize":10,
+	"rows":[
+		{"id":"1","userName":"马云","roleVal":"1","role":"超级管理员","createTime":"2017-06-01","stateStr":"","remark":"所有权限"},
+		{"id":"2","userName":"马化腾","roleVal":"2","role":"管理员","createTime":"2017-06-01","stateStr":"","remark":""},
+		{"id":"3","userName":"李彥宏","roleVal":"3","role":"操作员","createTime":"2017-06-01","stateStr":"","remark":"部分权限"},
+		{"id":"4","userName":"刘强东","roleVal":"3","role":"操作员","createTime":"2017-06-02","stateStr":"禁用","remark":"京东CEo"},
+		{"id":"5","userName":"马云","roleVal":"1","role":"超级管理员","createTime":"2017-06-01","stateStr":"","remark":"所有权限"},
+		{"id":"6","userName":"马化腾","roleVal":"2","role":"管理员","createTime":"2017-06-01","stateStr":"","remark":""},
+		{"id":"7","userName":"李彥宏","roleVal":"3","role":"操作员","createTime":"2017-06-01","stateStr":"","remark":"部分权限"},
+		{"id":"8","userName":"刘强东","roleVal":"3","role":"操作员","createTime":"2017-06-02","stateStr":"禁用","remark":"京东CEo"},
+		{"id":"9","userName":"马云","roleVal":"1","role":"超级管理员","createTime":"2017-06-01","stateStr":"","remark":"所有权限"},
+		{"id":"10","userName":"马化腾","roleVal":"2","role":"管理员","createTime":"2017-06-01","stateStr":"","remark":""},
+		{"id":"11","userName":"李彥宏","roleVal":"3","role":"操作员","createTime":"2017-06-01","stateStr":"","remark":"部分权限"},
+		{"id":"12","userName":"刘强东","roleVal":"3","role":"操作员","createTime":"2017-06-02","stateStr":"禁用","remark":"京东CEo"}
+ 	],"total":12
+}

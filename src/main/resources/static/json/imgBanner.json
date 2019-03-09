@@ -1,0 +1,31 @@
+{
+	"pageIndex":0,
+	"pageSize":0,
+	"rows":[
+		{
+			"id":"1",
+			"imgLocation":"广州--首页",
+			"city":"广州",
+			"system":"IOS",
+			"describe":"默认轮播图",
+			"operation":""
+		},
+		{
+			"id":"2",
+			"imgLocation":"南京--首页",
+			"city":"南京",
+			"system":"Android",
+			"describe":"xxxxx活动",
+			"operation":""
+		},
+		{
+			"id":"3",
+			"imgLocation":"广州电子车票",
+			"city":"广州",
+			"system":"IOS",
+			"describe":"中秋活动",
+			"operation":""
+		}
+	],
+	"total":3
+}

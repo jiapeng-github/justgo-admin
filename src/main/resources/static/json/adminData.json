@@ -1,0 +1,16 @@
+[
+	{"menu":"车牌管理","url":"","icon":"fa fa-car","list":[
+		{"name":"会员管理","url":"html/car/会员管理.html"},
+		{"name":"订单管理","url":"html/car/订单管理.html"}
+	]},
+	{"menu":"系统管理","url":"","icon":"fa fa-cog","list":[
+		{"name":"用户管理","url":"html/car/用户管理.html"},
+		{"name":"角色管理","url":"html/car/角色管理.html"}
+	]},
+	{"menu":"角色管理","url":"","icon":"fa fa-user-plus","list":[
+	{"name":"添加角色","url":"5.htm"},
+	{"name":"删除角色","url":"6.htm"},
+	{"name":"更新角色","url":"7.htm"}
+    ]},
+	{"menu":"图片管理","url":"image.htm","icon":"fa fa-photo","list":""}
+]
