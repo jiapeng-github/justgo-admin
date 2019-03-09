@@ -1,0 +1,47 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="commonJsGroup">
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+    <script src="/static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+    <script src="/static/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+    <script src="/static/js/plugins/layer/layer.js"></script>
+    <script src="/static/js/plugins/validate/jquery.validate.min.js"></script>
+    <!--自定义工具js-->
+    <script src="/static/js/common.js"></script>
+</div>
+
+<div th:fragment="highchartsJsGroup">
+    <!--highcharts 基本js 开始-->
+    <script src="/static/js/plugins/highcharts/code/highcharts.js"></script>
+    <!--highcharts 基本js 结束-->
+    <!--highcharts 漏斗需要js 开始-->
+    <script src="/static/js/plugins/highcharts/code/highcharts-more.js"></script>
+    <script src="/static/js/plugins/highcharts/code/modules/funnel.js"></script>
+    <!--highcharts 漏斗需要js 结束 -->
+</div>
+
+<div th:fragment="ueditorJsGroup">
+    <script src="/static/js/ueditor/ueditor.config.js"></script>
+    <script src="/static/js/ueditor/ueditor.all.js"></script>
+</div>
+
+<div th:fragment="highchartsCssGroup">
+    <!--highcharts样式-->
+    <link rel="stylesheet" type="text/css" href="/static/js/plugins/highcharts/code/css/highcharts.css"/>
+</div>
+
+<div th:fragment="commonCssGroup">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/js/plugins/bootstrap-table/bootstrap-table.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/style.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/basic.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/js/plugins/datapicker/datepicker3.css"/>
+</div>
+
+</body>
+</html>

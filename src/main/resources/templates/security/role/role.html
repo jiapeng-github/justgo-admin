@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>角色管理</title>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+    <script src="/static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/js/plugins/bootstrap-table/bootstrap-table.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/style.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/basic.css"/>
+    <script src="/static/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/js/plugins/datapicker/datepicker3.css"/>
+    <script src="/static/js/plugins/layer/layer.js"></script>
+    <script src="/static/js/bootstrap-treeview.min.js"></script>
+    <script src="/static/js/plugins/validate/jquery.validate.min.js"></script>
+	<script src="/static/js/jqueryJSON.js"></script>
+	<script src="/static/js/common.js"></script>
+
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row animated fadeInRight">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>角色管理</h5>
+                </div>
+                <div class="ibox-content timeline">
+                    <div class="row">
+                    	<div class="col-sm-12">
+                    		<button class="btn btn-primary" type="button" id="addRole">
+                                <i class="glyphicon glyphicon-plus"></i> 新增角色
+                            </button>
+                            <button class="btn btn-info" type="button" id="editRole" style="margin-left: 12px;">
+                                <i class="glyphicon glyphicon-edit"></i> 编辑角色
+                            </button>
+							<button class="btn btn-info" type="button" id="deleteRole" style="margin-left: 12px;">
+                                <i class="glyphicon glyphicon-edit"></i> 删除角色
+                            </button>
+                            <button class="btn btn-warning" type="button" id="accredit" style="margin-left: 12px;">
+                                <i class="glyphicon glyphicon-folder-open"></i> 授权
+                            </button>
+                    	</div>
+                    </div>
+                    <div class="timeline-item" style="margin-top: 10px;">
+                        <table id="table" data-unique-id="id"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--新赠角色-->
+<div class="modal fade in" id="myModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" onclick="clearValidate()" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">新增角色</h4>
+            </div>
+            <form method="post" id="validateForm" class="form-horizontal">
+				<input type="hidden" name="id" id="roleID" value=""/>
+            	<div class="modal-body">
+            		<div class="form-group">
+            			<div class="col-sm-3 control-label">角色名称：</div>
+            			<div class="col-sm-6"><input type="text" name="roleName" id="roleName" class="form-control"/></div>
+            		</div>
+	                <div class="form-group">
+            			<div class="col-sm-3 control-label">上级角色：</div>
+            			<div class="col-sm-6">
+            				<select name="fId" id="selRole" class="form-control">
+            					<option value="">请选择</option>
+            				</select>
+            			</div>
+            		</div>
+					<div class="form-group">
+						<div class="col-sm-3 control-label">APP_ID：</div>
+						<div class="col-sm-6">
+							<select name="appID" id="appID" class="form-control">
+								<option value="">请选择</option>
+								<option value="1">系统一</option>
+								<option value="2">系统二</option>
+							</select>
+						</div>
+					</div>
+            		<div class="form-group">
+            			<div class="col-sm-3 control-label">备注：</div>
+            			<div class="col-sm-8"><textarea cols="4" id="description" name="description" class="form-control"></textarea></div>
+            		</div>
+	            </div>
+	            <div class="modal-footer">
+	            	<button type="button" id="submitRole" class="btn btn-primary">确定</button>
+	                <!--<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>-->
+	            </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--授权弹出层-->
+	<div class="modal" id="mymodal1" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+					<h4 class="modal-title">授权管理</h4>
+				</div>
+				<form class="form-horizontal" role="form" id="addFrom1">
+					<div class="modal-body">
+						<div style="overflow: hidden;">
+							<div class="impower-group-lf">
+								<div id="treeview-checkable" style="min-height: 350px;"></div>
+							</div>
+							<div class="impower-group-rg">
+								<div class="impower-text"><textarea name="" id="impower-val" rows="4" class="form-control"></textarea></div>
+								<div class="impower-center">
+									<button type="button" id="btn-check-all" class="btn btn-danger" style="margin-right: 35px;"> 全 选 </button>
+									<!--<button type="button" id="btn-uncheck-all" class="btn btn-warning"> 反 选 </button>-->
+									<button type="button" id="btn-uncheck-all" class="btn btn-warning"> 全不选 </button>
+								</div>
+								<div class="impower-button">
+									<p><button type="button"  class="btn btn-success" id="sq"> 授 权 </button></p>
+									<p><button type="button" class="btn btn-info" data-dismiss="modal"> 取 消 </button></p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+
+<script type="text/javascript">
+    var $table = $("#table");
+    var fromValidate;
+    $(function () {
+        initTable();
+
+        function getAllRole() {
+            $.ajax({
+                type: "POST",
+                url: "/security/getAllRole",
+                dataType: "json",
+                async: false,
+                contentType: "application/json",
+                success: function (data) {
+                    var selRole = $("#selRole");
+                    selRole.empty();
+                    selRole.append("<option value=''>请选择</option>");
+                    $.each(data, function (index) {
+                        $("#selRole").append("<option value='" + data[index].id + "'>" + data[index].roleName + "</option>");
+                    });
+                }
+            });
+        }
+        
+        //新增角色
+        $("#addRole").click(function(){
+            getAllRole();
+        	$("#myModal").modal("show");
+        	$("#myModalLabel").html("新增角色");
+        	$("#roleID,#roleName,#selRole,#ramerk").val("");
+            $("#validateForm").attr("action","/security/addRole");
+        });
+
+        $("#submitRole").click(function () {
+            var validateForm = $("#validateForm");
+            var valid = validateForm.valid();
+            if (!valid) return false;
+
+            var actionURL = $("#validateForm").attr("action");
+            $.ajax({
+                type: "POST",
+                url: actionURL,
+                dataType: "json",
+                contentType: "application/json",
+                data : JSON.stringify(validateForm.serializeObject()),
+                success : function (data) {
+                    if(data.responseCode="0000"){
+                        layer.msg("新增或修改角色成功！");
+					}else{
+                        layer.msg(data.responseDesc);
+					}
+                    hideModal();
+                    clearValidate();
+                    $table.bootstrapTable('refresh');
+                }
+            });
+        });
+
+        function hideModal() {
+            $("#myModal").modal("hide");
+        }
+
+        //编辑角色
+		$("#editRole").click(function(){
+			var data = !$table.bootstrapTable('getSelections').length;
+			if (data) {
+				layer.alert('请选择你要编辑的角色！', {
+				  skin: 'layui-layer-molv', //样式类名
+				  closeBtn: 0
+				})
+			} else {
+                getAllRole();
+                $("#validateForm").attr("action","/security/editRole");
+				$("#myModal").modal("show");
+				$("#myModalLabel").html("编辑角色");
+				var obj = $table.bootstrapTable('getRowByUniqueId', getIdSelections());
+				$("#roleName").val(obj.roleName);
+				$("#selRole").val(obj.fId);
+				$("#roleID").val(obj.id);
+				$("#appID").val(obj.appID);
+				$("#description").val(obj.description)
+			}
+		});
+		function getIdSelections() {
+	        return $.map($table.bootstrapTable('getSelections'), function (row) {
+	            return row.id
+	        });
+	   };
+		
+
+
+        //删除
+        $("#deleteRole").click(function(){
+            var data = $table.bootstrapTable('getSelections');
+            if (data.length === 0) {
+                layer.alert('请选择你要删除的角色！', {
+                    skin: 'layui-layer-molv' //样式类名
+                    ,closeBtn: 0
+                })
+            }else if (data.length > 1) {
+                layer.alert('只能删除一个角色！', {
+                    skin: 'layui-layer-molv' //样式类名
+                    ,closeBtn: 0
+                })
+            } else {
+                layer.confirm('是否确认删除的角色！', {
+                    skin: 'layui-layer-molv',
+                    btn: ['确定','取消'] //按钮
+                }, function(){
+                    //删除记录
+                    var idSelections = getIdSelections();
+                    $.getJSON("/security/deleteRole", {id: idSelections[0]}, function (data) {
+                        if (data.responseCode === "0000") {
+                            $table.bootstrapTable('remove', {field: 'id', values: idSelections});
+                            layer.msg('删除成功');
+                        } else {
+                            layer.msg(data.responseDesc);
+                        }
+                    });
+
+                }, function(){closeBtn: 0});
+            }
+        });
+
+        var $checkableTree;
+
+
+		//授权弹出层
+		$("#accredit").click(function(){
+			var data = $table.bootstrapTable('getSelections');
+			if (data.length === 0) {
+	    		layer.alert('请选择你要授权的角色！', {
+				  skin: 'layui-layer-molv',closeBtn: 0
+				})
+	    	}else if (data.length > 1){
+                layer.alert('只能选择一个用户进行授权！', {
+                    skin: 'layui-layer-molv',closeBtn: 0
+                })
+			}else {
+                var roleID = data[0].id;
+                console.info(JSON.stringify(data));
+               /* if (selectTable){
+                    roleID = selectTable.id;
+				}*/
+                $.ajax({
+                    type: "GET",
+                    url: "/security/getALLResource/" + roleID,
+                    dataType: "json",
+                    async: false,
+                    contentType: "application/json",
+                    success: function (response) {
+                        var data = response;
+                        var str="";
+                        var nodeCheckedSilent = false;
+                        var nodeUncheckedSilent = false;
+                        $checkableTree = function() {
+                            return $('#treeview-checkable').treeview({
+                                levels: 1,		//2默认展开，1为收缩
+                                data:data,
+                                showCheckbox: true,
+                                showIcon: false,
+                                multiSelect:false,
+                                //color: "#428bca",
+                                expandIcon: "glyphicon glyphicon-triangle-right",
+                                collapseIcon: "glyphicon glyphicon-triangle-bottom",
+                                nodeIcon: "glyphicon glyphicon-user",
+                                showTags: true,
+                                onNodeChecked: function(event, node) {
+                                    if(nodeCheckedSilent){
+                                        return;
+                                    }
+                                    nodeCheckedSilent = true;
+                                    checkAllParent(node);
+                                    checkAllSon(node);
+                                    nodeCheckedSilent = false;
+                                    $('#impower-val').val(showTreeSelected());
+                                },
+                                onNodeUnchecked: function (event, node) {
+                                    if(nodeUncheckedSilent)
+                                        return;
+                                    nodeUncheckedSilent = true;
+                                    uncheckAllParent(node);
+                                    uncheckAllSon(node);
+                                    nodeUncheckedSilent = false;
+                                    $('#impower-val').val(showTreeSelected());
+                                }
+                            });
+                        }();
+                        $('#btn-check-all').on('click', function (e) {	//全选
+                            $checkableTree.treeview('checkAll', { silent: $('#chk-check-silent').is(':checked') });
+                        });
+
+                        $('#btn-uncheck-all').on('click', function (e) {//反选
+                            $checkableTree.treeview('uncheckAll', { silent: $('#chk-check-silent').is(':checked') });
+                        });
+                        // 显示已经选择的
+                        function showTreeSelected() {
+                            var nodes = $checkableTree.treeview('getChecked');
+                            var str =""
+                            for(var i in nodes){
+                                //console.info("我选择了:"+nodes[i].text);
+                                str += nodes[i].text + ",";
+                            }
+                            return str;
+                        }
+
+                        $('#impower-val').val(showTreeSelected());
+
+
+                        //选中全部父节点
+                        function checkAllParent(node){
+                            $checkableTree.treeview('checkNode',node.nodeId,{silent:true});
+                            var parentNode = $checkableTree.treeview('getParent',node.nodeId);
+                            if(!("nodeId" in parentNode)){
+                                return;
+                            }else{
+                                checkAllParent(parentNode);
+                            }
+                        }
+                        //取消全部父节点
+                        function uncheckAllParent(node){
+                            $checkableTree.treeview('uncheckNode',node.nodeId,{silent:true});
+                            var siblings = $checkableTree.treeview('getSiblings', node.nodeId);
+                            var parentNode = $checkableTree.treeview('getParent',node.nodeId);
+                            if(!("nodeId" in parentNode)) {
+                                return;
+                            }
+                            var isAllUnchecked = true;  //是否全部没选中
+                            for(var i in siblings){
+                                if(siblings[i].state.checked){
+                                    isAllUnchecked=false;
+                                    break;
+                                }
+                            }
+                            if(isAllUnchecked){
+                                uncheckAllParent(parentNode);
+                            }
+
+                        }
+
+                        //级联选中所有子节点
+                        function checkAllSon(node){
+                            $checkableTree.treeview('checkNode',node.nodeId,{silent:true});
+                            if(node.nodes!=null&&node.nodes.length>0){
+                                for(var i in node.nodes){
+                                    checkAllSon(node.nodes[i]);
+                                }
+                            }
+                        }
+                        //级联取消所有子节点
+                        function uncheckAllSon(node){
+                            $checkableTree.treeview('uncheckNode',node.nodeId,{silent:true});
+                            if(node.nodes!=null&&node.nodes.length>0){
+                                for(var i in node.nodes){
+                                    uncheckAllSon(node.nodes[i]);
+                                }
+                            }
+                        }
+
+                        //隐藏授权页面
+                        function hideSQModal() {
+                            $("#mymodal1").modal("hide");
+                        }
+
+                        //授权
+                        $("#sq").click(function () {
+                            var selectTable = $table.bootstrapTable('getSelections');
+
+                            var roleID = selectTable[0].id;
+                            var nodes = $checkableTree.treeview('getChecked');
+                            var resourcesID = [];
+                            for(var i in nodes){
+                                resourcesID.push(nodes[i].id);
+                            }
+							if(resourcesID.length == 0){
+                                layer.msg("请至少选择一个菜单！");
+                                return;
+							}
+                            $.ajax({
+                                type: "POST",
+                                url: "/security/authorization",
+                                dataType: "json",
+                                data : {
+                                    "roleID" : roleID,
+                                   "resourcesID" : resourcesID,
+								},
+                                traditional : true,
+                                success : function (data) {
+                                    layer.msg(data.responseDesc);
+                                    hideSQModal();
+                                }
+                            });
+
+
+                        });
+                    }});
+	    		$("#mymodal1").modal("toggle");
+	    	}
+	    });
+
+    	//新赠用角色验证
+		$.validator.setDefaults({
+		    highlight: function(e) {
+		        $(e).closest(".form-group").removeClass("has-success").addClass("has-error")
+		    },
+		    success: function(e) {
+		        e.closest(".form-group").removeClass("has-error").addClass("has-success")
+		    },
+		    errorElement: "span",
+		    errorPlacement: function(e, r) {
+		        e.appendTo(r.is(":radio") || r.is(":checkbox") ? r.parent().parent().parent() : r.parent())
+		    },
+		    errorClass: "help-block m-b-none",
+		    validClass: "help-block m-b-none"
+		}),
+		$().ready(function() {
+		    var e = "<i class='fa fa-times-circle'></i> ";
+            fromValidate = $("#validateForm").validate({
+		        rules: {
+                    fId: "required",
+		            roleName: {required: !0,minlength: 2,maxlength:50},
+                    description:{maxlength:200}
+		        },
+		        messages: {
+		            roleName: {
+		                required: e + "请输入角色名称",
+		                minlength: e + "角色名必须2个字符以上",
+                        maxlength:e + "角色名称不能超过50个字符"
+		            },
+                    description:{
+		                maxlength:e + "角色备注不能超过200个字符"
+		            },
+                    fId:{required: e + "请选择上级角色"}
+		        }
+		    })
+		});
+    	
+    });
+
+    //初始化
+    function initTable() {
+        $table.bootstrapTable({
+            method: 'get',
+//            contentType: "application/json",
+            url: '/security/roleList',
+            striped: true,	//设置为 true 会有隔行变色效果
+            //设置为 true 会在表格底部显示分页条
+            pagination: true,
+            //设置在哪里进行分页，可选值为 'client' 或者 'server'。设置 'server'时，必须设置 服务器数据地址（url）或者重写ajax方法
+            sidePagination: "server",
+            //如果设置了分页，页面数据条数
+            pageSize: 10,
+            //如果设置了分页，设置可供选择的页面数据条数。设置为All 则显示所有记录。
+            pageList: [10],
+            pageNumber: 1,
+            queryParamsType: "other",
+//            rowStyle: rowStyle,
+            columns: [
+                {
+                    field: "state",
+                    checkbox: true
+                }, {
+                    field: "id",
+                    visible: false,
+                },{
+                    field: "fId",
+                    visible: false,
+                }, {
+                    field: "roleName",
+                    title: "角色名称",
+                    align: 'center',
+                }, {
+                    field: "fName",
+                    title: "上级角色",
+                    align: 'center',
+//                    valign: 'middle'
+                }, {
+                    field: "appID",
+                    title: "appID",
+                    align: 'center',
+                    formatter: function noticeTypeProcess(value, row, index) {
+						if (value === 1){
+						    return '系统1'
+						} else if (value === 2){
+						    return '系统2'
+						}
+                    }
+                }, {
+                    field: "description",
+                    title: "备注",
+                    align: 'center',
+//                    valign: 'middle'
+                }
+            ]
+        });
+    };
+
+    function clearValidate() {
+        fromValidate.resetForm();
+        $("#validateForm")[0].reset();
+        $(".form-group").removeClass("has-success").removeClass("has-error");
+    }
+</script>
+</html>

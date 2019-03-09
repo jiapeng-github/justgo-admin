@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>用户管理--顺路管理平台</title>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+    <script src="/static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/js/plugins/bootstrap-table/bootstrap-table.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/style.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/basic.css"/>
+    <script src="/static/js/plugins/layer/layer.js"></script>
+    <script src="/static/js/plugins/validate/jquery.validate.min.js"></script>
+    <script src="/static/js/jqueryJSON.js"></script>
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/md5.js"></script>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row animated fadeInRight">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>用户管理</h5>
+                </div>
+                <div class="ibox-content timeline">
+                    <div class="timeline-item">
+                        <form class="form-inline">
+                            <div class="form-group">
+                                <label>用户名:&nbsp;</label>
+                                <input class="form-control" id="userNameSearch" type="text">
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="button" id="searchU">
+                                    <i class="fa fa-search"></i> 搜索
+                                </button>
+                            </div>
+                        </form>
+                        <div class="row">
+                        	<div class="col-sm-12">
+                        		<div class="btn-group hidden-xs" id="exampleToolbar" role="group">
+                                    <button type="button" id="addUser" class="btn btn-outline btn-default" title="添加用户">
+                                        <i class="glyphicon glyphicon-plus" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" id="editUser" class="btn btn-outline btn-default" title="编辑用户">
+                                        <i class="glyphicon glyphicon-pencil" aria-hidden="true"></i>
+                                    </button>
+                                    <!--<button type="button" id="forbidden" class="btn btn-outline btn-default" title="禁用">
+                                        <i class="glyphicon glyphicon-ban-circle" aria-hidden="true"></i>
+                                    </button>-->
+                                    <button type="button" id="del" class="btn btn-outline btn-default" title="删除">
+                                        <i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                        	</div>
+
+                        </div>
+                    </div>
+                    <div class="timeline-item" style="margin-top: 10px;">
+                        <table id="table" data-unique-id="id"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--添加/编辑用户-->
+<div class="modal fade in" id="myModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" onclick="clearValidate()" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">新建用户</h4>
+            </div>
+            <form method="post" class="form-horizontal" id="validateForm">
+                <input type="hidden" name="userID" id="userID" value=""/>
+            	<div class="modal-body">
+            		<div class="form-group">
+            			<div class="col-sm-3 control-label">用户名：</div>
+            			<div class="col-sm-8"><input type="text" name="userName" id="userName" class="form-control"/></div>
+            		</div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label">姓名：</div>
+                        <div class="col-sm-8"><input type="text" name="fullName" id="fullName" class="form-control"/></div>
+                    </div>
+	                <div class="form-group">
+            			<div class="col-sm-3 control-label">所属角色：</div>
+            			<div class="col-sm-8">
+            				<select name="roleID" class="form-control" id="selRole">
+                                <option value="">请选择</option>
+            				</select>
+            			</div>
+            		</div>
+            		<div class="form-group">
+            			<div class="col-sm-3 control-label">密码：</div>
+            			<div class="col-sm-8"><input type="password" name="password" id="password" class="form-control"/></div>
+            		</div>
+            		<div class="form-group">
+            			<div class="col-sm-3 control-label">确认密码：</div>
+            			<div class="col-sm-8"><input type="password" name="confirmPassword" id="confirmPassword" class="form-control"/></div>
+            		</div>
+	            </div>
+	            <div class="modal-footer">
+	            	<button type="button" class="btn btn-primary" id="submitUser">确定</button>
+	                <!--<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>-->
+	            </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+
+<script type="text/javascript">
+    var $table = $("#table");
+    var fromValidate;
+
+    $(function () {
+        initTable();
+        $('#searchU').click(function () {
+            $table.bootstrapTable('refresh');
+        });
+
+        function getAllRole() {
+            $.ajax({
+                type: "POST",
+                url: "/security/getAllRole",
+                dataType: "json",
+                async: false,
+                contentType: "application/json",
+                success: function (data) {
+                    var selRole = $("#selRole");
+                    selRole.empty();
+                    selRole.append("<option value=''>请选择</option>");
+                    $.each(data, function (index) {
+                        $("#selRole").append("<option value='" + data[index].id + "'>" + data[index].roleName + "</option>");
+                    });
+                }
+            });
+        }
+
+        $("#submitUser").click(function () {
+            var validateForm = $("#validateForm");
+            var valid = validateForm.valid();
+            if (!valid) return false;
+
+            var actionURL = $("#validateForm").attr("action");
+            let password = $('#password').val();
+            let confirmPassword = $('#confirmPassword').val();
+            if (actionURL.indexOf("addUser") > -1){//添加用户
+                if (password === "" || confirmPassword === ""){
+                    alert("需要填写密码!!");
+                    return false;
+                }
+
+                if (password !== confirmPassword) {
+                    alert("密码不一样!!");
+                    return false;
+                }
+
+            }else {
+                if (password !== "" || confirmPassword !== ""){
+                    if (password !== confirmPassword) {
+                        alert("密码不一样!!");
+                        return false;
+                    }
+                }else {
+                    alert("需要填写密码!!");
+                    return false;
+                }
+            }
+            $("#password").val(hex_md5($("#password").val()));
+            $.ajax({
+                type: "POST",
+                url: actionURL,
+                dataType: "json",
+                contentType: "application/json",
+                data : JSON.stringify($("#validateForm").serializeObject()),
+                success : function (data) {
+                    if(data.responseDesc == "成功"){
+                        data.responseDesc = "用户添加成功";
+                    }
+                    layer.msg(data.responseDesc);
+                    hideModal();
+                    clearValidate();
+                    $table.bootstrapTable('refresh');
+                }
+            });
+        });
+
+        function hideModal() {
+            $("#myModal").modal("hide");
+        }
+
+		//新赠用户
+		$("#addUser").click(function(){
+            getAllRole();
+			$("#myModal").modal("show");$("#myModalLabel").html("新建用户");
+			$(".modal-body input,#selRole,#ramerk").val("");
+            $("#validateForm").attr("action","/security/addUser");
+		});
+
+
+		//编辑用户
+		$("#editUser").click(function(){
+            getAllRole();
+			var data = $table.bootstrapTable('getSelections');
+			if (!data.length || data.length > 1) {
+				layer.alert('请选择一个要编辑的用户！', {
+				  skin: 'layui-layer-molv' //样式类名
+				  ,closeBtn: 0
+				})
+			} else {
+				$("#myModalLabel").html("编辑用户");
+				var obj = $table.bootstrapTable('getRowByUniqueId', getIdSelections());
+                $("#userName").val(obj.userName);
+                $("#fullName").val(obj.fullName);
+                $("#userID").val(obj.id);
+                //$("#selRole").find("option[text='" + obj.roleName + "']").attr("selected", true);
+                $("#selRole").val(obj.roleID);
+                $("#validateForm").attr("action","/security/editUser");
+                $("#myModal").modal("show");
+			}
+
+		});
+
+		//禁用
+		$("#forbidden").click(function(){
+			var data = !$table.bootstrapTable('getSelections').length;
+			if (data) {
+				layer.alert('请选择你要禁用的用户！', {
+				  skin: 'layui-layer-molv' //样式类名
+				  ,closeBtn: 0
+				})
+			} else {layer.msg('禁用成功')};
+		});
+		//删除
+		$("#del").click(function(){
+			var data = $table.bootstrapTable('getSelections');
+			if (!data.length || data.length > 1) {
+				layer.alert('请选择一个要删除的用户！', {
+				  skin: 'layui-layer-molv' //样式类名
+				  ,closeBtn: 0
+				})
+			} else {
+				layer.confirm('是否确认删除的用户！', {
+				  skin: 'layui-layer-molv',
+				  btn: ['确定','取消'] //按钮
+				}, function(){
+				  //删除记录
+                    var idSelections = getIdSelections();
+                    $.getJSON("/security/deleteUser", {id: idSelections[0]}, function (data) {
+                        if (data.responseCode === "0000") {
+                            $table.bootstrapTable('remove', {field: 'id', values: idSelections});
+                            layer.msg('删除成功');
+                        } else {
+                            layer.msg(data.responseDesc);
+                        }
+                    });
+
+				}, function(){closeBtn: 0});
+			}
+		});
+		function getIdSelections() {
+
+            if ($table.bootstrapTable('getSelections') > 1) return -1;
+
+	        return $.map($table.bootstrapTable('getSelections'), function (row) {
+	            return row.id
+	        });
+	    }
+		//新赠用户验证
+		$.validator.setDefaults({
+		    highlight: function(e) {
+		        $(e).closest(".form-group").removeClass("has-success").addClass("has-error")
+		    },
+		    success: function(e) {
+		        e.closest(".form-group").removeClass("has-error").addClass("has-success")
+		    },
+		    errorElement: "span",
+		    errorPlacement: function(e, r) {
+		        e.appendTo(r.is(":radio") || r.is(":checkbox") ? r.parent().parent().parent() : r.parent())
+		    },
+		    errorClass: "help-block m-b-none",
+		    validClass: "help-block m-b-none"
+		}),
+		$().ready(function() {
+		    var e = "<i class='fa fa-times-circle'></i> ";
+            fromValidate = $("#validateForm").validate({
+		        rules: {
+                    userNameSearch: "required",
+                    roleID: "required",
+		            account:"required",
+		            userName: {required: !0,minlength: 2,maxlength:20},
+		            password: {required: !0,minlength: 6,maxlength:18},
+		            confirmPassword: {
+		                required: !0, minlength: 6,equalTo: "#password"
+		            }
+		        },
+		        messages: {
+		            userName: {
+		                required: e + "请输入您的用户名",
+		                minlength: e + "用户名必须两个字符以上",
+                        maxlength: e + "用户名不能超过20个字符"
+		            },
+                    fullName: {
+                        required: e + "请输入您的姓名",
+                        minlength: e + "姓名必须两个字符以上",
+                        maxlength: e + "姓名不能超过20个字符"
+                    },
+                    roleID:{required: e + "请选择所属角色"},
+		            account:{required: e + "请输入账户"},
+		            password: {
+		                required: e + "请输入您的密码",
+		                minlength: e + "密码需输入6-18位字符",
+                        maxlength: e + "密码需输入6-18位字符",
+		            },
+		            confirmPassword: {
+		                required: e + "请再次输入密码",
+		                minlength: e + "密码需输入6-18位字符",
+		                equalTo: e + "两次输入的密码不一致"
+		            }
+		        }
+		    })
+		});
+
+    });
+
+    function clearValidate() {
+        fromValidate.resetForm();
+        $("#validateForm")[0].reset();
+        $(".form-group").removeClass("has-success").removeClass("has-error");
+    }
+
+
+    //初始化
+    function initTable() {
+        $table.bootstrapTable({
+            method: 'post',
+//            contentType: "application/json",
+            url: '/security/userList',
+            //设置为 true 会有隔行变色效果
+            striped: true,
+            //设置为 true 会在表格底部显示分页条
+            pagination: true,
+            //设置在哪里进行分页，可选值为 'client' 或者 'server'。设置 'server'时，必须设置 服务器数据地址（url）或者重写ajax方法
+            sidePagination: "server",
+            //singleSelect: true,	//单选
+            //如果设置了分页，页面数据条数
+            pageSize: 10,
+            //如果设置了分页，设置可供选择的页面数据条数。设置为All 则显示所有记录。
+            pageList: [10],
+            queryParams: queryParams,
+            pageNumber: 1,
+            queryParamsType: "other",
+            columns: [
+                {
+                    field: "state",
+                    checkbox: true
+                },{
+                    field: "id",
+                    visible: false,
+                },{
+                    field: "roleID",
+                    visible: false,
+                },  {
+                    field: "userName",
+                    title: "用户名",
+                    align: 'center',
+//                    valign: 'middle'
+                }, {
+                    field: "fullName",
+                    title: "姓名",
+                    align: 'center',
+//                    valign: 'middle'
+                }, {
+                    field: "roleName",
+                    title: "角色名",
+                    align: 'center',
+                }, {
+                    field: "createTimeString",
+                    title: "创建时间",
+                    align: 'center',
+                    valign: 'middle'
+                }, {
+                    field: "userStatus",
+                    title: "状态",
+                    align: 'center',
+                    formatter:function (val) {
+                        if(val == 1){
+                            val ="正常";
+                        }else if(val == 2){
+                            val ="禁用";
+                        }
+                        return val;
+                    }
+                }, {
+                    field: 'remark',
+                    title: '备注',
+                    align: 'center',
+                    width: '18%',
+                }
+            ]
+        });
+    }
+
+
+    function queryParams(params) {
+        return {
+            pageNumber: params.pageNumber,  //当前页面
+            pageSize: params.pageSize,	  //每页显示条数
+            sortName: params.sortName,
+            order: params.sortOrder,
+            userName: $('#userNameSearch').val()
+        };
+    };
+
+</script>
+</html>

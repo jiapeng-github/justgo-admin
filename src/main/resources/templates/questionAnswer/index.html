@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>问题解答管理</title>
+    <div th:include="layerFragments :: commonJsGroup"></div>
+    <div th:include="layerFragments :: commonCssGroup"></div>
+    <div th:include="layerFragments :: ueditorJsGroup"></div>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row animated fadeInRight">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>问题解答管理</h5>
+                </div>
+                <div class="ibox-content timeline">
+                    <div class="timeline-item">
+                        <form class="form-inline">
+                            <div class="form-group">
+                                <label>问题:&nbsp;</label>
+                                <input type="text" name="question" id="questionSearch" class="form-control"/>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="button" id="searchU">
+                                    <i class="fa fa-search"></i> 搜索
+                                </button>&nbsp;&nbsp;&nbsp;
+                                <button class="btn btn-primary" type="reset">
+                                    <i class="fa fa-repeat"></i> 重置
+                                </button>&nbsp;&nbsp;&nbsp;
+                                <button class="btn btn-primary" type="button" id="add">
+                                    <i class="fa fa-plus"></i> 新增
+                                </button>&nbsp;&nbsp;&nbsp;
+                                <button class="btn btn-primary" type="button" id="delete">
+                                    <i class="fa fa-remove"></i> 删除
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="timeline-item">
+                        <table id="table" data-unique-id="id"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--查看问题答疑-->
+<div class="modal fade in" id="viewModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">问题答疑详情</h4>
+            </div>
+           <div class="modal-body">
+               <form class="form-horizontal" role="form" >
+                   <div class="form-group">
+                       <div class="col-sm-2 control-label">问题：</div>
+                       <div class="col-sm-8" id="detail_question"></div>
+                   </div>
+                   <div class="form-group">
+                       <div class="col-sm-2 control-label">提问人：</div>
+                       <div class="col-sm-8" id="detail_questioner"></div>
+                   </div>
+                   <div class="form-group">
+                       <div class="col-sm-2 control-label">解答：</div>
+                       <div class="col-sm-8" id="detail_answer"></div>
+                   </div>
+                   <div class="form-group">
+                       <div class="col-sm-2 control-label">解答人：</div>
+                       <div class="col-sm-8" id="detail_answerer"></div>
+                   </div>
+                   <div class="form-group">
+                       <div class="col-sm-2 control-label">附件：</div>
+                       <div class="col-sm-8" id="detail_file"></div>
+                   </div>
+               </form>
+           </div>
+        </div>
+    </div>
+</div>
+<!--新增/编辑问题答疑-->
+<div class="modal fade in bs-example-modal-lg" id="modifyInfoModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="modifyInfoModalLabel"></h4>
+            </div>
+            <div class="modal-body">
+                <form id="modifyInfoModalForm" class="form-horizontal" role="form" >
+                    <input type="hidden" name="id" id="id">
+                    <div class="form-group">
+                        <div class="col-sm-2 control-label">问题：</div>
+                        <div class="col-sm-8">
+                            <textarea name="question" id="question" class="form-control" rows="8"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2 control-label">解答：</div>
+                        <div class="col-sm-8">
+                            <textarea name="answer" id="answer" class="form-control" rows="8"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-2 control-label">附件：</div>
+                        <div class="col-sm-8">
+                            <input th:type="file" name="multipartFile" id="file">
+                            <div id="show_file"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" id="saveBtn">确定</button>
+                        <input type="reset" name="reset" style="display: none;" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+<script type="text/javascript">
+    var $table = $("#table");
+    $(function () {
+
+        initTable();
+        iniDatePicket();
+
+        $('#searchU').click(function () {
+            $table.bootstrapTable('refresh');
+        });
+
+    });
+
+    //初始化
+    function initTable() {
+        $table.bootstrapTable({
+            method: 'GET',
+            contentType: "application/json",
+            url: '/questionAnswer/list',
+            //striped: true,	//设置为 true 会有隔行变色效果
+            //设置为 true 会在表格底部显示分页条
+            pagination: true,
+            //设置在哪里进行分页，可选值为 'client' 或者 'server'。设置 'server'时，必须设置 服务器数据地址（url）或者重写ajax方法
+            sidePagination: "server",
+            //如果设置了分页，页面数据条数
+            pageSize: 10,
+            //如果设置了分页，设置可供选择的页面数据条数。设置为All 则显示所有记录。
+            pageList: [10],
+            queryParams: queryParams,
+            pageNumber: 1,
+            queryParamsType: "",
+            columns: [
+                {checkbox: true},
+                {field: "id",title:"编号",visible: false},
+                {field: "question",title: "问题",align: 'center',valign: 'middle'},
+                {field: "questioner",title: "提问人",align: 'center',valign: 'middle'},
+                {field: "questionTimeString",title: "提问时间",align: 'center',valign: 'middle'},
+                {field: "answerer",title: "解答人",align: 'center',valign: 'middle'},
+                {field: "answerTimeString",title: "解答时间",align: 'center',valign: 'middle'},
+                {field: "operation",title: "操作",align: 'center',width: '20%',formatter: operateFormatter}
+            ]
+        });
+    }
+
+    function queryParams(params) {
+        var param;
+        param = {
+            pageNumber: params.pageNumber,  //当前页面
+            pageSize: params.pageSize,	  //每页显示条数
+            question: $.trim($('#questionSearch').val())
+        };
+        return param;
+    };
+
+
+
+	function operateFormatter(value, row, index) {
+        var html = "&nbsp;<button  class='btn btn-success btn-sm detailInfo'  onclick=examine(this,"+row.id+")>查看</button>&nbsp;";
+        html = html + "&nbsp;<button  class='btn btn-warning btn-sm editInfo'  onclick=edit(this,"+row.id+")>解答</button>&nbsp;";
+        return html;
+   	};
+
+
+   	//查看
+    var examine = function(ths,id){
+        $("#viewModal").modal("show");
+        $.ajax({
+            type: "POST",
+            url: "/questionAnswer/detail",
+            dataType: "json",
+            data : {id:id},
+            success : function (data) {
+                $("#detail_question").empty().append(data.question);
+                $("#detail_questioner").empty().append(data.questioner);
+                $("#detail_answer").empty().append(data.answer);
+                $("#detail_answerer").empty().append(data.answerer);
+                if(data.fileName != null){
+                    $("#detail_file").empty().append('<a download="'+data.fileName+'" href="/questionAnswer/downloadFile/'+data.id+'">'+data.fileName+'</a>');
+                }
+            }
+        });
+
+    };
+
+    //新增页面
+    $("#add").click(function(){
+        $("input[type=reset]").trigger("click");
+        $("#modifyInfoModal").modal("show");
+        $("#modifyInfoModalLabel").html("新增提问");
+        $("#modifyInfoModalForm").attr("action","/questionAnswer/create");
+        $("#question").removeAttr("readonly");
+        $("#answer").attr("readonly","true");
+        $("#show_file").empty();
+    });
+
+    //编辑页面
+    var edit = function(ths,id){
+        $("input[type=reset]").trigger("click");
+        $("#modifyInfoModal").modal("show");
+        $("#modifyInfoModalLabel").html("问题解答");
+        $("#modifyInfoModalForm").attr("action","/questionAnswer/modify");
+        $("#question").attr("readonly","true");
+        $("#answer").removeAttr("readonly");
+        $.ajax({
+            type: "POST",
+            url: "/questionAnswer/detail",
+            dataType: "json",
+            data : {id:id},
+            success : function (data) {
+                $("#id").val(id);
+                $("#question").val(data.question);
+                $("#questioner").val(data.questioner);
+                $("#answer").val(data.answer);
+                $("#answerer").val(data.answerer);
+
+                if(data.fileName != null){
+                    $("#show_file").empty().append('<a download="'+data.fileName+'" href="/questionAnswer/downloadFile/'+data.id+'">'+data.fileName+'</a>');
+                }
+            }
+        });
+    };
+
+    //删除
+    $("#delete").click(function(){
+        var data = $table.bootstrapTable('getSelections');
+        if (data.length == 0) {
+            layer.alert('请选择至少一条数据！', {
+                skin: 'layui-layer-molv' //样式类名
+                ,closeBtn: 0
+            })
+        } else {
+            layer.confirm('是否确认删除！', {
+                skin: 'layui-layer-molv',
+                btn: ['确定','取消'] //按钮
+            }, function(){
+                //删除记录
+                var idSelections = getIdSelections();
+                $.getJSON("/questionAnswer/delete", {ids: idSelections.join(",")}, function (data) {
+                    if (data.responseCode === "0000") {
+                        $table.bootstrapTable('remove', {field: 'id', values: idSelections});
+                        layer.msg('删除成功');
+                    } else {
+                        layer.msg(data.responseDesc);
+                    }
+                });
+
+            }, function(){closeBtn: 0});
+        }
+    });
+
+    // 保存数据
+    /*$('#saveBtn').unbind('click.saveBtn').bind('click.saveBtn',function(){
+        var id = $("#modifyInfoModalForm input[name='id']").val();
+        var file = $('#file')[0].files[0];
+
+        var ajaxUrl = $("#modifyInfoModalForm").attr("action"); msg='操作成功';
+        // var dataObj = $('#modifyInfoModalForm').serialize();
+        var formData = new FormData();
+        formData.append("multipartFile", file);
+        console.log(formData);
+        ajaxReq(
+            ajaxUrl,
+            formData,
+            function(json) {
+                if (json.responseCode==="0000") {
+                    layer.msg(msg, {time:3000});
+                    $("#modifyInfoModal").modal('toggle');
+                    $table.bootstrapTable('refresh');
+                } else if (json.responseCode==="9994"){
+                    layer.msg(json.responseDesc, {time:3000});
+                } else {
+                    layer.msg('操作失败', {time:3000});
+                }
+            },
+            "POST",
+            true);
+        return;
+    });*/
+
+    $("#saveBtn").click(function () {
+        var formData = new FormData();
+        var file = $('#file')[0].files[0];
+        formData.append("multipartFile", file);
+        formData.append("id", $('#id').val());
+        formData.append("question", $('#question').val());
+        formData.append("answer", $('#answer').val());
+        $.ajax({
+            type: "POST",
+            url: $("#modifyInfoModalForm").attr("action"),
+            data: formData,
+            processData: false,
+            contentType: false,
+            cache: false,
+            success: function (json) {
+                if (json.responseCode==="0000") {
+                    layer.msg(json.responseDesc, {time:3000});
+                    $("#modifyInfoModal").modal('toggle');
+                    $table.bootstrapTable('refresh');
+                } else if (json.responseCode==="9994"){
+                    layer.msg(json.responseDesc, {time:3000});
+                } else {
+                    layer.msg('操作失败', {time:3000});
+                }
+            }
+        });
+    });
+
+    /*function ajaxReq(url, data, callback, method, async){
+        $.ajax({
+            url: url,
+            dataType: 'json',
+            data: data,
+            type: method,
+            async: async,
+            success: function(data){
+                callback(data);
+            },
+            error:function(data){
+                callback(data);
+            }
+        });
+    }*/
+
+    function getIdSelections() {
+        return $.map($table.bootstrapTable('getSelections'), function (row) {
+            return row.id
+        });
+    }
+
+    function iniDatePicket() {
+        $('.input-daterange_day input').each(function() {
+            console.log($(this));
+            $(this).datepicker({
+                format: 'yyyy-mm-dd',
+                autoclose:true,
+                language:'cn',
+                calendarWeeks:true,
+                // endDate : new Date(),
+                weekStart:1
+            });
+        });
+        $('.input-daterange_week input').each(function(index,item) {
+            if(index==0){
+                $(item).datepicker({
+                    format: 'yyyy-mm-dd',
+                    autoclose:true,
+                    language:'cn',
+                    daysOfWeekDisabled:[0,2,3,4,5,6],
+                    calendarWeeks:true,
+                    endDate : new Date(),
+                    weekStart:1
+                });
+            }else {
+                $(item).datepicker({
+                    format: 'yyyy-mm-dd',
+                    autoclose:true,
+                    language:'cn',
+                    daysOfWeekDisabled:[1,2,3,4,5,6],
+                    calendarWeeks:true,
+                    endDate : new Date(),
+                    weekStart:1
+                });
+            }
+
+        });
+        $('.input-daterange_month input').each(function() {
+            $(this).datepicker({
+                format: 'yyyy-mm',
+                autoclose:true,
+                language:'cn',
+                minViewMode:'months',
+                calendarWeeks:true,
+                endDate : new Date(),
+                weekStart:1
+            });
+        });
+        $('.input-daterange_year input').each(function() {
+            $(this).datepicker({
+                format: 'yyyy',
+                autoclose:true,
+                language:'cn',
+                minViewMode:'years',
+                calendarWeeks:true,
+                endDate : new Date(),
+                weekStart:1
+            });
+        });
+    }
+
+</script>
+</html>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn" name="justgo">
+    <Appenders>
+
+        <!--这个输出控制台的配置-->
+        <Console name="Console" target="SYSTEM_OUT">
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="trace" onMatch="ACCEPT" onMismatch="DENY"/>
+            <!--这个都知道是输出日志的格式-->
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %-5level %class{36} TRACE_ID[%X{TRACE_ID}] %L - %msg%xEx%n"/>
+            <!--<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss,SSS } %-5level %class{36} %L - %msg%xEx%n"/>-->
+        </Console>
+        
+        <!--<RollingFile name="RollingFile" fileName="D:/data/logs/jsutgo/admin.log"
+                     filePattern="D:/data/logs/jsutgo/$${date:yyyy-MM}/admin-%d{MM-dd-yyyy}-%i.log">
+            <PatternLayout>
+                <Pattern>%magenta{%d{yyyy-MM-dd HH:mm:ss,SSS}} %highlight{%-5level %class{36}} %yellow{%L} - %highlight{%msg%xEx%n}{STYLE=Logback}</Pattern>
+                &lt;!&ndash;<Pattern>%d{yyyy-MM-dd HH:mm:ss,SSS } %-5level %class{36} %L - %msg%xEx%n</Pattern>&ndash;&gt;
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+        </RollingFile>-->
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="RollingFile"/>
+        </Root>
+        <!--特定包的输出等级-->
+        <Logger name="org.springframework" level="info" />
+        <Logger name="org.apache.commons.beanutils" level="info" />
+        <Logger name="org.apache.http" level="info" />
+    </Loggers>
+</Configuration>

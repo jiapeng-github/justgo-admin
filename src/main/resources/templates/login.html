@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+    <title>课程知识库系统</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/login.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/slide-unlock.css"/>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/plugins/layer/layer.js"></script>
+    <script src="/static/js/common.js"></script>
+    <script src="/static/js/md5.js"></script>
+    <script src="/static/js/jquery.slideunlock.js"></script>
+    <link rel="icon" type="image/x-icon" href="/static/img/profile_small.jpg">
+</head>
+
+<body>
+<div class="login">
+    <div class="login-bg">
+        <div>&nbsp;</div>
+        <div><img src="/static/img/login_bg.png"/></div>
+        <div></div>
+    </div>
+    <div class="login-layout">
+        <form method="post" class="login-form" id="login-form">
+            <h3>课程知识库系统</h3>
+            <div class="login-form-put"><input type="text" name="userName" id="username" placeholder="请输入用户名"/></div>
+            <div class="login-form-pass"><input type="password" name="password" id="password" placeholder="请输入密码"/></div>
+            <div id="slider">
+                <div id="slider_bg"></div>
+                <span id="label">>></span> <span id="labelTip">拖动滑块验证</span>
+                <input type="hidden" id="isSuccess" value="0">
+            </div>
+            <p>
+                <button type="button" id="login" class="login-form-btn"></button>
+            </p>
+            <div class="login-err"></div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    var slider = new SliderUnlock("#slider",{
+        successLabelTip : "验证成功"
+    },function(){
+        $("#isSuccess").val(1);
+        //以下四行设置恢复初始，不需要可以删除
+        // window.location.href="#";
+        /*setTimeout(function(){
+            $("#labelTip").html("拖动滑块验证");
+            $("#labelTip").css("color","#787878");
+        },20000);*/
+    });
+    slider.init();
+
+    let allowEnter = true;
+
+    $(document).keyup(function(event){
+        if(event.keyCode === 13 && allowEnter){
+            login();
+        }
+    });
+
+    function login() {
+        if($("#isSuccess").val()==0){
+            loginErr.html("* 请拖动滑块验证！");
+            return false
+        }
+        $("#isSuccess").val(0);
+        slider.init();
+        let username = $("#username");
+        let loginErr = $(".login-err");
+        let password = $("#password");
+        if (username.val() === "") {
+            loginErr.html("* 请输入用户名！");
+            username.focus();
+            return false
+        } else if (password.val() === "") {
+            loginErr.html("* 请输入密码！");
+            password.focus();
+            return false
+        } else {
+            loginErr.hide();
+        }
+        $("#password").val(hex_md5($("#password").val()));
+        let dataJson = $('#login-form').serializeArray();
+
+        $.ajax({
+            type: "POST",
+            url: "/user/login",
+            dataType: "json",
+            async: false,
+            data: dataJson,
+            timeout: 10*1000,
+            //contentType: "application/json",
+            success: function (responseData) {
+                if ('0000' !== responseData.responseCode) {
+                    allowEnter = false;
+                    layer.open({
+                        content: '用户名或密码错误!!',
+                        end: function(){
+                            allowEnter = true;
+                        }
+                    });
+                    return false;
+                }
+                location.href = "/";
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown){
+                if (textStatus === 'timeout') {
+                    allowEnter = false;
+                    layer.open({
+                        content: '请求超时!!!',
+                        icon: 2,
+                        end: function () {
+                            allowEnter = true;
+                        }
+                    });
+                }
+                
+                if (XMLHttpRequest.readyState === 0) {
+                    allowEnter = false;
+                    layer.open({
+                        content: '无网络,请求超时!!!',
+                        icon: 2,
+                        end: function () {
+                            allowEnter = true;
+                        }
+                    });
+                }
+                
+            }
+        });
+
+
+    }
+
+    $("#login").click(function () {
+        login();
+    });
+
+    //超时刷新父页面
+    function timeOutRefresh() {
+        const regExp = new RegExp("user/loginPage");
+        let match = regExp.test(parent.location.href);
+        if (!match) parent.location.reload();
+    }
+
+    timeOutRefresh();
+
+</script>
+</body>
+</html>

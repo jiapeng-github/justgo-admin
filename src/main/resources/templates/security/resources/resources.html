@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>资源管理--管理平台</title>
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+    <script src="/static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/js/plugins/bootstrap-table/bootstrap-table.min.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/style.min.css"/>
+    <link rel="stylesheet" type="text/css" href="/static/css/basic.css"/>
+    <script src="/static/js/plugins/datapicker/bootstrap-datepicker.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/js/plugins/datapicker/datepicker3.css"/>
+    <script src="/static/js/plugins/layer/layer.js"></script>
+    <script src="/static/js/bootstrap-treeview.min.js"></script>
+    <script src="/static/js/plugins/validate/jquery.validate.min.js"></script>
+	<script src="/static/js/jqueryJSON.js"></script>
+    <script src="/static/js/plugins/fontIconPicker-2.0.0/jquery.fonticonpicker.min.js"></script>
+    <link rel="stylesheet" href="/static/js/plugins/fontIconPicker-2.0.0/css/jquery.fonticonpicker.min.css">
+    <link href="/static/css/font-awesome.min.css" rel="stylesheet"/>
+    <link rel="stylesheet"
+          href="/static/js/plugins/fontIconPicker-2.0.0/themes/grey-theme/jquery.fonticonpicker.grey.css">
+    <script src="/static/js/plugins/bootstrap-select-1.13.0-beta/js/bootstrap-select.js"></script>
+    <script src="/static/js/plugins/bootstrap-select-1.13.0-beta/js/i18n/defaults-zh_CN.js"></script>
+    <link rel="stylesheet" href="/static/js/plugins/bootstrap-select-1.13.0-beta/css/bootstrap-select.css">
+    <script src="/static/js/security/iconData.js"></script>
+    <script src="/static/js/common.js"></script>
+
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row animated fadeInRight">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>资源管理</h5>
+                </div>
+                <div class="ibox-content timeline">
+                    <form class="form-inline">
+                        <input type="hidden" id="fIdSearch">
+                        <input type="hidden" id="firstLevel">
+                        <input type="hidden" id="levelNum" value="1">
+                        <input type="hidden" id="isShowDetail" value="0">
+                        <!--<div class="form-group">
+                            <label>一级菜单名称:&nbsp;</label>
+                            <input class="form-control" id="userNameSearch" type="text">
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-primary" type="button" id="searchU">
+                                <i class="fa fa-search"></i> 搜索
+                            </button>
+                        </div>-->
+                    </form>
+                    <div class="row">
+                    	<div class="col-sm-12">
+                    		<button class="btn btn-primary" type="button" id="addResources">
+                                <i class="glyphicon glyphicon-plus"></i> 新增资源
+                            </button>
+                            <button class="btn btn-info" type="button" id="returnResources" style="margin-left: 12px;">
+                                <i class="glyphicon glyphicon-arrow-up"></i> 返回上级资源
+                            </button>
+                    	</div>
+                    </div>
+                    <div class="timeline-item" style="margin-top: 10px;">
+                        <table id="oneTable"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--新增资源-->
+<div class="modal fade in" id="myModal" tabindex="-1" role="dialog" data-backdrop="static" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" onclick="closeModal()" aria-hidden="true">×</button>
+                <h4 class="modal-title" id="myModalLabel">新增资源</h4>
+            </div>
+            <form method="post" id="validateForm" class="form-horizontal">
+                <input type="hidden" name="id" id="id"/>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label">资源类型：</div>
+                        <div class="col-sm-8">
+                            <select name="resourceType" class="form-control" id="resourceType">
+                                <option value="">请选择</option>
+                                <option value="1">菜单标题</option>
+                                <option value="2">菜单</option>
+                                <option value="3">功能</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" id="resourceStatusDIV">
+                        <div class="col-sm-3 control-label">资源名称：</div>
+                        <div class="col-sm-8">
+                            <input type="radio" value="1" name="resourceStatus" id="resourceStatusOne"> <i></i> 正常 &nbsp;
+                            <input type="radio" value="2" name="resourceStatus" id="resourceStatusTwo"> <i></i> 禁用
+                        </div>
+                    </div>
+                    <div class="form-group" id="resourceNameDIV">
+                        <div class="col-sm-3 control-label">资源名称：</div>
+                        <div class="col-sm-8"><input type="text" name="resourceName" id="resourceName" class="form-control"/></div>
+                    </div>
+                    <div class="form-group" id="permissionDIV">
+                        <div class="col-sm-3 control-label">权限字符串：</div>
+                        <div class="col-sm-8"><input type="text" name="permission" id="permission" class="form-control"/></div>
+                    </div>
+                    <div class="form-group" id="resourceUrlDIV">
+                        <div class="col-sm-3 control-label">资源URL：</div>
+                        <div class="col-sm-8">
+                            <select name="resourceUrl" class="form-control" id="resourceUrl" data-live-search="true">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group" id="fIdDIV">
+                        <div class="col-sm-3 control-label">父菜单：</div>
+                        <div class="col-sm-8">
+                            <select name="fId" class="form-control" id="fId" data-live-search="true">
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="iconDIV">
+                        <div class="col-sm-3 control-label">资源图标：</div>
+                        <div class="col-sm-8">
+                            <select name="icon" class="form-control" id="icon">
+                                <option>请选择</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="submitRole" class="btn btn-primary">确定</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--授权弹出层-->
+	<div class="modal" id="mymodal1" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+					<h4 class="modal-title">授权管理</h4>
+				</div>
+				<form class="form-horizontal" role="form" id="addFrom1">
+				</form>
+			</div>
+		</div>
+	</div>
+</body>
+
+<script type="text/javascript">
+    let oneTable = $("#oneTable");
+    $(function () {
+
+        initOneTable();
+
+        $('#iconDIV').hide();
+        $('#permissionDIV').hide();
+        $('#resourceUrlDIV').hide();
+        $('#fIdDIV').hide();
+        $('#resourceNameDIV').hide();
+        $('#resourceStatusDIV').hide();
+
+        $("#addResources").click(function(){
+            $("#resourceStatusOne").prop('checked',true);
+            getResourcesUrls();
+            $("#myModalLabel").html('新增资源');
+            $("#myModal").modal("show");
+            $('#id').val('');
+        });
+
+        function hideModal() {
+            $("#myModal").modal('hide');
+        }
+    });
+
+    function closeModal(){
+        $('#resourceType').selectpicker('val','');
+        $('#resourceName').val('');
+        $('#permission').val('');
+        let $selected = $(".selected-icon");
+        $selected.children("i").removeClass();
+        $selected.children("i").addClass('fip-icon-block');
+        $('#fId').selectpicker('val','');
+        $('#iconDIV').hide();
+        $('#permissionDIV').hide();
+        $('#resourceUrlDIV').hide();
+        $('#fIdDIV').hide();
+        $('#resourceNameDIV').hide();
+        $('#resourceStatusDIV').hide();
+        //$("input[name='resourceStatus'][value='1']").attr("checked", "checked");
+
+       $("#resourceStatusTwo").removeAttr("checked");
+        hideModal();
+    }
+
+    function hideModal() {
+        $('#myModal').modal('hide');
+    }
+
+    $('#returnResources').click(function () {
+        // 当前菜单等级
+        let $levelNum = $('#levelNum');
+        let levelNum = $levelNum.val();
+        let firstLevel = $('#firstLevel').val();
+        if (levelNum === '3') {
+            $('#fIdSearch').val(firstLevel);
+            $levelNum.val(2);
+        }
+        else if (levelNum === '2') {
+            $levelNum.val(1);
+            $('#fIdSearch').val('');
+        }
+        else {
+            layer.alert('没有上一级!!', {icon: 2});
+            return false;
+        }
+        oneTable.bootstrapTable('refresh');
+    });
+
+    $('#resourceType').on("change", function () {
+        let resourceType = $('#resourceType').selectpicker('val');
+        if (resourceType !== '') {
+            if (resourceType === '1') {
+                $('#iconDIV').show();
+                $('#resourceNameDIV').show();
+                $('#resourceStatusDIV').show();
+                $('#permissionDIV').hide();
+                $('#resourceUrlDIV').hide();
+                $('#fIdDIV').hide();
+                let $selected = $(".selected-icon");
+                $selected.children("i").removeClass();
+                $selected.children("i").addClass('fip-icon-block');
+            }else {
+                $('#resourceNameDIV').show();
+                $('#resourceStatusDIV').show();
+                $('#iconDIV').hide();
+                $('#permissionDIV').show();
+                $('#resourceUrlDIV').show();
+                $('#fIdDIV').show();
+
+            }
+            getResourceFidByType(resourceType);
+        }else {
+            $('#iconDIV').hide();
+            $('#permissionDIV').hide();
+            $('#resourceUrlDIV').hide();
+            $('#fIdDIV').hide();
+            $('#resourceNameDIV').hide();
+            $('#resourceStatusDIV').hide();
+            getResourceFidByType(1);
+        }
+    });
+
+
+    function getResourceFidByType(resourceType) {
+        $.ajax({
+            type: "POST",
+            url: "/security/getResourceFidByType/" + resourceType,
+            dataType: "json",
+            async: false,
+            contentType: "application/json",
+            success: function (responseData) {
+                if (responseData.responseCode !== '0000'){
+                    alert('获取失败!!');
+                    return false;
+                }
+                let data = responseData.data;
+                let fId = $("#fId");
+                fId.empty();
+                fId.append("<option value=''>请选择</option>");
+                $.each(data, function (index) {
+                    // console.info(data)
+                    $("#fId").append("<option value='" + data[index].id + "'>" + data[index].resourceName + "</option>");
+                });
+                $('#fId').selectpicker('refresh');
+            }
+        });
+    }
+
+    function getResourcesUrls() {
+        $.ajax({
+            type: "POST",
+            url: "/security/getResourcesUrls",
+            dataType: "json",
+            async: false,
+            contentType: "application/json",
+            success: function (responseData) {
+                if (responseData.responseCode !== '0000'){
+                    alert('获取失败!!');
+                    return false;
+                }
+                let data = responseData.data;
+                let resourceUrl = $("#resourceUrl");
+                resourceUrl.empty();
+                resourceUrl.append("<option value=''>请选择</option>");
+                $.each(data, function (index) {
+                    $("#resourceUrl").append("<option value='" + data[index] + "'>" + data[index] + "</option>");
+                });
+                $('#resourceUrl').selectpicker('refresh');
+            }
+        });
+    }
+
+    $('#resourceUrl').selectpicker({
+        style: 'form-control'
+    });
+    $('#fId').selectpicker({
+        style: 'form-control'
+    });
+    $('#resourceType').selectpicker({
+        style: 'form-control'
+    });
+
+
+
+    let fontIconPicker = $('#icon').fontIconPicker({
+        source: icons,
+        iconsPerPage: 30,
+        theme: 'fip-grey',
+    });
+
+    $("#submitRole").click(function () {
+        let icon = $(".selected-icon").children("i").attr('class');
+        let resourceType = $('#resourceType').selectpicker('val');
+        let resourceUrl = $('#resourceUrl').selectpicker('val');
+        let fId = $('#fId').selectpicker('val');
+        let resourceName = $('#resourceName').val();
+        let permission = $('#permission').val();
+        let resourceStatus = $("input[name='resourceStatus']:checked").val();
+
+        if ( resourceType === '' ||  resourceName === '') {
+            layer.alert('要填写全部参数', {icon: 2});
+            return false;
+        }
+
+        if (resourceType !== '1' && (fId === '' || resourceUrl === '' || permission === '')) {
+            layer.alert('要填写全部参数', {icon: 2});
+            return false;
+        }
+
+        if (resourceType === '1' && icon === 'fip-icon-block') {
+            layer.alert('要填写全部参数', {icon: 2});
+            return false;
+        }
+
+        let id = $('#id').val();
+
+        let data = {
+            id: id,
+            icon: icon,
+            resourceType: resourceType,
+            resourceUrl: resourceUrl,
+            fId: fId,
+            resourceName: resourceName,
+            permission: permission,
+            resourceStatus: resourceStatus
+        };
+
+        let dataJson = JSON.stringify(data);
+
+        if (id === ''){//没有id就是添加
+            $.ajax({
+                type: "POST",
+                url: "/security/addResource/",
+                dataType: "json",
+                async: false,
+                data: dataJson,
+                contentType: "application/json",
+                success: function (responseData) {
+                    if (responseData.responseCode !== '0000') {
+                        layer.alert('添加失败!!');
+                        return false;
+                    }
+                    oneTable.bootstrapTable('refresh');
+                    closeModal();
+                }
+            });
+        } else {
+            $.ajax({
+                type: "POST",
+                url: "/security/updateResource/",
+                dataType: "json",
+                async: false,
+                data: dataJson,
+                contentType: "application/json",
+                success: function (responseData) {
+                    if (responseData.responseCode !== '0000') {
+                        layer.alert('更新失败!!');
+                        return false;
+                    }
+                    oneTable.bootstrapTable('refresh');
+                    closeModal();
+                }
+            });
+        }
+
+
+
+    });
+
+    //初始化
+    function initOneTable() {
+        oneTable.bootstrapTable({
+            method: 'post',
+//            contentType: "application/json",
+            url: '/security/getResources',
+            //设置为 true 会有隔行变色效果
+            striped: true,
+            //设置为 true 会在表格底部显示分页条
+            pagination: true,
+            //设置在哪里进行分页，可选值为 'client' 或者 'server'。设置 'server'时，必须设置 服务器数据地址（url）或者重写ajax方法
+            sidePagination: "server",
+            //singleSelect: true,	//单选
+            //如果设置了分页，页面数据条数
+            pageSize: 10,
+            //如果设置了分页，设置可供选择的页面数据条数。设置为All 则显示所有记录。
+            pageList: [10],
+            queryParams: queryParams,
+            pageNumber: 1,
+            queryParamsType: "other",
+            columns: [
+                {field: "state",checkbox: true},
+                {field: "id",visible: false},
+                {field: "icon", title: "图标", align: 'center', formatter: iconFormatter},
+                {field: "resourceName", title: "资源名称", align: 'center',},
+                {field: "resourceUrl", title: "资源URL", align: 'center',},
+                {field: "permission", title: "权限字符串", align: 'center',},
+                {field: "resourceType", title: "资源类型", align: 'center',formatter: resourceTypeFormatter},
+                {field: 'resourceStatus', title: '状态', align: 'center', width: '18%',formatter: resourceStatusFormatter},
+                {field: 'operate', title: '操作', align: 'center', width: '18%',formatter: operateFormatter}
+            ]
+        });
+    }
+
+    function iconFormatter(value, row, index) {
+        return '<i class="' + value + '"></i>'
+    }
+
+    function resourceTypeFormatter(value, row, index) {
+        if (value === 1) {
+            return '菜单标题';
+        }else if (value === 2) {
+            return '菜单';
+        }else {
+            return '功能';
+        }
+    }
+
+    function resourceStatusFormatter(value, row, index) {
+        if (value === 1) {
+            return '有效';
+        }else {
+            return '禁用';
+        }
+    }
+
+    function operateFormatter(value, row, index) {
+
+        let myArray = [];
+        if (row.resourceType !== 3)
+            myArray.push('<button id="examine" class="btn btn-primary btn-sm" type="button" onclick="showDetail(this,'+row.id+','+row.resourceType+')">查看</button>&nbsp; ');
+        myArray.push('<button id="edit" class="btn btn-warning btn-sm" type="button" onclick="editResource(this,'+row.id+')">编辑</button>&nbsp; ');
+
+
+        return myArray.join('');
+    }
+
+    function showDetail(ths, fId,resourceType) {
+
+        $('#fIdSearch').val(fId);
+        if (resourceType === 1) {
+            $('#levelNum').val(2);
+            $('#firstLevel').val(fId);
+        }
+        else if (resourceType === 2) {
+            $('#levelNum').val(3);
+        }
+        let $isShowDetail = $('#isShowDetail');
+        $isShowDetail.val('1');
+        oneTable.bootstrapTable('refresh');
+        $isShowDetail.val('0');
+    }
+
+    /**
+     * 编辑
+     * @param ths
+     * @param id
+     */
+    function editResource(ths, id){
+        getResourcesUrls();
+
+        let data = {
+           id: id
+        };
+
+        let dataJson = JSON.stringify(data);
+
+        $.ajax({
+            type: "POST",
+            url: "/security/getResources",
+            dataType: "json",
+            async: false,
+            data: dataJson,
+            contentType: "application/json",
+            success: function (responseData) {
+                let sysResources = responseData.rows[0];
+                let resourceType = sysResources.resourceType;
+                let resourceStatus = sysResources.resourceStatus;
+                $('#id').val(sysResources.id);
+                $('#resourceType').selectpicker('val',resourceType);
+                getResourceFidByType(resourceType);
+                $('#resourceName').val(sysResources.resourceName);
+                $('#permission').val(sysResources.permission);
+                $('#resourceUrl').selectpicker('val',sysResources.resourceUrl);
+                $('#fId').selectpicker('val',sysResources.fId);
+                if (resourceType !== '1') {
+                    let $selected = $(".selected-icon");
+                    $selected.children("i").removeClass();
+                    $selected.children("i").addClass(sysResources.icon);
+                }
+                if (resourceStatus === 1) {
+                    $("#resourceStatusOne").prop('checked',true);
+                }else {
+                    $("#resourceStatusTwo").prop('checked',true);
+                }
+            }
+
+        });
+
+        $("#myModalLabel").html("编辑资源");
+       $("#myModal").modal("show");
+    }
+
+
+    function queryParams(params) {
+        return {
+            pageNumber: params.pageNumber,  //当前页面
+            pageSize: params.pageSize,	  //每页显示条数
+            sortName: params.sortName,
+            order: params.sortOrder,
+            fId: $('#fIdSearch').val(),
+            isShowDetail:$('#isShowDetail').val()
+        };
+    }
+
+
+</script>
+</html>

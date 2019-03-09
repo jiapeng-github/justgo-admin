@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:c="http://www.w3.org/1999/XSL/Transform">
+<head>
+    <meta charset="UTF-8">
+    <title>字典表管理</title>
+    <div th:include="layerFragments :: commonJsGroup"></div>
+    <div th:include="layerFragments :: commonCssGroup"></div>
+    <!--<script src="/static/js/common.js"></script>-->
+    <script src="/static/js/dict/sysDict.js?v=1.38"></script>
+</head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content">
+    <div class="row animated fadeInRight">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>订单管理</h5>
+                </div>
+                <div class="ibox-content timeline">
+                    <div class="timeline-item">
+                        <form class="form-inline">
+                            <div class="form-group">
+                                <label>字典名称:&nbsp;</label>
+                                <input class="form-control" id="dictName" type="text">
+                            </div>
+                            <div class="form-group">
+                                <label>字典值:&nbsp;</label>
+                                <input class="form-control" id="dictValue" type="text">
+                            </div>
+                            <div class="form-group">
+                                <label>字典描述:&nbsp;</label>
+                                <input class="form-control" id="dictDesc" type="text">
+                            </div>
+                            <div class="form-group">
+                                <label>状态:&nbsp;</label>
+                                <select class="form-control" id="valid">
+                                    <option value="">全部</option>
+                                    <option value="0">失效</option>
+                                    <option value="1">生效</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" type="button" id="searchU">
+                                    <i class="fa fa-search"></i> 搜索
+                                </button>
+                                <button class="btn btn-info" type="button" id="clearbtn">
+                                    <i class="fa fa-refresh"></i> 重置
+                                </button>
+                            </div>
+                        </form>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="btn-group hidden-xs" id="exampleToolbar" role="group">
+                                    <button type="button" id="add" class="btn btn-outline btn-default" title="添加字典">
+                                        <i class="glyphicon glyphicon-plus" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" id="manageDictData" class="btn btn-outline btn-default" title="管理数据">
+                                        <i class="glyphicon glyphicon glyphicon-align-justify" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" id="flushRedisData" class="btn btn-outline btn-default" title="重导缓存">
+                                        <i class="glyphicon glyphicon-ban-circle" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" id="reportDict" class="btn btn-outline btn-default" title="导出报表">
+                                        <i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="timeline-item" style="margin-top: 10px;">
+                        <table id="table" data-unique-id="id"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="mymodal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">新建字典</h4>
+            </div>
+            <form class="form-horizontal" role="form" id="addFrom" onsubmit="return false">
+                <input type="hidden" name="id" id="id"/>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="col-md-3 control-label"><font color="red">*</font>字典名字：</label>
+                        <div class="col-md-5">
+                            <input type="text" name="dictName" class="form-control" required placeholder="字典名字"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label"><font color="red">*</font>字典值：</label>
+                        <div class="col-md-5">
+                            <input type="text" name="dictValue" class="form-control"  required placeholder="字典值"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label"><font color="red">*</font>详细描述：</label>
+                        <div class="col-md-5">
+                            <input type="text" name="dictDesc" class="form-control" required placeholder="详细描述"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label"><font color="red">*</font>状态1: </label>
+                        <div class="col-md-5">
+                            <select name="valid" class="form-control" style="height: 35px;width: 100px;">
+                                <option value="1">生效</option>
+                                <option value="0">失效</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="submit" class="btn btn-success">提 交</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">取 消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+<script type="text/javascript">
+
+</script>
+</html>
