@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--系统字典表对应的mapper配置文件-->
+<mapper namespace="com.justgo.admin.mapper.SysDictionaryMapper">
+
+    <resultMap type="com.justgo.admin.entity.SysDictionary" id="sysDictionaryMap">
+        <id property="id" column="ID"/>
+        <result property="created" column="CREATED"/>
+        <result property="dictName" column="DICT_NAME"/>
+        <result property="dictValue" column="DICT_VALUE"/>
+        <result property="dictDesc" column="DICT_DESC"/>
+        <result property="valid" column="VALID"/>
+    </resultMap>
+
+    <select id="query" resultMap="sysDictionaryMap"
+            parameterType="com.justgo.admin.entity.SysDictionary">
+        SELECT * FROM SYS_DICTIONARY
+        WHERE 1=1
+        <if test="dto.dictName != null and dto.dictName != '' ">AND DICT_NAME like CONCAT('%',#{dto.dictName},'%')</if>
+        <if test="dto.dictValue != null and dto.dictValue != '' ">AND DICT_VALUE like CONCAT('%',#{dto.dictValue},'%')
+        </if>
+        <if test="dto.dictDesc != null and dto.dictDesc != '' ">AND DICT_DESC like CONCAT('%',#{dto.dictDesc},'%')</if>
+        <if test="dto.valid != null and dto.valid != ''">AND VALID = #{dto.valid}</if>
+        ORDER BY CREATED DESC
+        LIMIT #{beginNum},#{rowNum}
+    </select>
+
+    <select id="count" resultType="int" parameterType="com.justgo.admin.entity.SysDictionary">
+        SELECT
+        COUNT(*)
+        FROM SYS_DICTIONARY
+        WHERE
+        1=1
+        <if test="dto.dictName != null and dto.dictName != '' ">AND DICT_NAME like CONCAT('%',#{dto.dictName},'%')</if>
+        <if test="dto.dictValue != null and dto.dictValue != '' ">AND DICT_VALUE like CONCAT('%',#{dto.dictValue},'%')
+        </if>
+        <if test="dto.dictDesc != null and dto.dictDesc != '' ">AND DICT_DESC like CONCAT('%',#{dto.dictDesc},'%')</if>
+        <if test="dto.valid != null and dto.valid != ''">AND VALID = #{dto.valid}</if>
+        ORDER BY CREATED DESC
+    </select>
+
+    <!--OR条件类型查询-->
+    <select id="queryForOr" resultMap="sysDictionaryMap"
+            parameterType="com.justgo.admin.entity.SysDictionary">
+        SELECT * FROM SYS_DICTIONARY
+        WHERE 1=0
+        <if test="dto.id != null and dto.id != '' ">OR ID = #{dto.id}</if>
+        <if test="dto.dictName != null and dto.dictName != '' ">OR DICT_NAME = #{dto.dictName}</if>
+        <if test="dto.dictValue != null and dto.dictValue != '' ">OR DICT_VALUE = #{dto.dictValue}</if>
+        ORDER BY CREATED DESC
+        LIMIT #{beginNum},#{rowNum}
+    </select>
+
+</mapper>

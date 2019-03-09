@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.justgo.admin.mapper.SysResourceMapper">
+    <resultMap id="BaseResultMap" type="com.justgo.admin.entity.SysResource">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="ID" jdbcType="BIGINT" property="id"/>
+        <result column="RESOURCE_NAME" jdbcType="VARCHAR" property="resourceName"/>
+        <result column="RESOURCE_URL" jdbcType="VARCHAR" property="resourceUrl"/>
+        <result column="F_ID" jdbcType="BIGINT" property="fId"/>
+        <result column="PERMISSION" jdbcType="VARCHAR" property="permission"/>
+        <result column="PRIORITY" jdbcType="INTEGER" property="priority"/>
+        <result column="RESOURCE_TYPE" jdbcType="INTEGER" property="resourceType"/>
+        <result column="ICON" jdbcType="VARCHAR" property="icon"/>
+        <result column="RESOURCE_STATUS" jdbcType="INTEGER" property="resourceStatus"/>
+    </resultMap>
+    <select id="selectByUserID" resultMap="BaseResultMap">
+        SELECT DISTINCT
+        re.*
+        FROM
+        sys_resource re
+        LEFT JOIN sys_role_resource rr ON re.ID = rr.RESOURCE_ID
+        LEFT JOIN sys_role r ON rr.ROLE_ID = r.ID
+        LEFT JOIN sys_user_role ur ON ur.ROLE_ID = r.ID
+        LEFT JOIN sys_user u ON ur.USER_ID = u.ID
+        WHERE
+        u.ID = #{userID}
+        ORDER BY
+        re.PRIORITY ASC
+    </select>
+    <select id="selectAllPermissions" resultMap="BaseResultMap">
+        SELECT
+        *
+        FROM
+        sys_resource r
+        WHERE
+        r.F_ID IS NOT NULL
+    </select>
+</mapper>

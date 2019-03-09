@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.justgo.admin.mapper.SysUserMapper">
+    <resultMap id="BaseResultMap" type="com.justgo.admin.entity.SysUser">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="ID" jdbcType="BIGINT" property="id"/>
+        <result column="USER_NAME" jdbcType="VARCHAR" property="userName"/>
+        <result column="USER_PASSWORD" jdbcType="VARCHAR" property="userPassword"/>
+        <result column="FULL_NAME" jdbcType="VARCHAR" property="fullName"/>
+        <result column="SALT" jdbcType="VARCHAR" property="salt"/>
+        <result column="F_ID" jdbcType="BIGINT" property="fId"/>
+        <result column="USER_STATUS" jdbcType="INTEGER" property="userStatus"/>
+        <result column="LAST_TIME" jdbcType="TIMESTAMP" property="lastTime"/>
+        <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+    <select id="selectUserAndRole" resultType="com.justgo.admin.dto.security.user.UserDTO"
+            parameterType="com.justgo.admin.dto.security.user.UserRequestDTO">
+        SELECT
+        u.ID AS id ,
+        u.USER_NAME AS userName ,
+        u.FULL_NAME AS fullName ,
+        u.USER_STATUS AS userStatus ,
+        u.CREATE_TIME AS createTime,
+        u.LAST_TIME AS lastTime ,
+        r.ROLE_NAME AS roleName ,
+        r.ID AS roleID
+        FROM
+        sys_user u
+        LEFT JOIN sys_user_role ur ON u.id = ur.USER_ID
+        LEFT JOIN sys_role r ON ur.ROLE_ID = r.ID
+        <where>
+            <if test="id != null">
+                AND u.ID = #{id}
+            </if>
+            <if test="userName != null">
+                AND u.USER_NAME LIKE '%${userName}%'
+            </if>
+        </where>
+        ORDER BY u.CREATE_TIME DESC
+    </select>
+</mapper>

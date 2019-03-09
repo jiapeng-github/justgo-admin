@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.justgo.admin.mapper.KnowledgePointMapper">
+    <resultMap id="BaseResultMap" type="com.justgo.admin.entity.KnowledgePoint">
+        <id column="ID" jdbcType="BIGINT" property="id"/>
+        <result column="TITLE" jdbcType="VARCHAR" property="title"/>
+        <result column="FILE" jdbcType="BLOB" property="file"/>
+        <result column="FILENAME" jdbcType="VARCHAR" property="fileName"/>
+        <result column="CONTENT" jdbcType="VARCHAR" property="content"/>
+        <result column="CREATE_USER" jdbcType="VARCHAR" property="createUser"/>
+        <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+
+    <select id="selectKnowledgePoint" resultMap="BaseResultMap" parameterType="com.justgo.admin.entity.KnowledgePoint">
+        SELECT
+            t.id,
+            t.title,
+            t.content,
+            t.create_user,
+            t.create_time
+        FROM
+          knowledge_point t
+        <where>
+            <if test="title != null">
+                AND t.title LIKE '%${title}%'
+            </if>
+        </where>
+        ORDER BY t.id DESC
+    </select>
+</mapper>

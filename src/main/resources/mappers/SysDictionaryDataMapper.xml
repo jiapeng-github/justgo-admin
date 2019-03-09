@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--系统字典数据表对应的mapper配置文件-->
+<mapper namespace="com.justgo.admin.mapper.SysDictionaryDataMapper">
+
+    <resultMap type="com.justgo.admin.entity.SysDictionaryData" id="sysDictionaryDataMap">
+        <id property="id" column="ID"/>
+        <result property="created" column="CREATED"/>
+        <result property="dictValue" column="DICT_VALUE"/>
+        <result property="dictDataName" column="DICTDATA_NAME"/>
+        <result property="dictDataValue" column="DICTDATA_VALUE"/>
+        <result property="dictDataDesc" column="DICTDATA_DESC"/>
+        <result property="valid" column="VALID"/>
+    </resultMap>
+
+    <resultMap id="sysDictionaryDataMap2" type="com.justgo.admin.entity.SysDictionaryData"
+               extends="sysDictionaryDataMap">
+        <result property="dictName" column="DICT_NAME"/>
+        <result property="dictDesc" column="DICT_DESC"/>
+    </resultMap>
+
+    <!--区别下面模糊查询的query，这个是精准查询-->
+    <select id="accurateQuery" resultMap="sysDictionaryDataMap"
+            parameterType="com.justgo.admin.entity.SysDictionaryData">
+        SELECT sda.* FROM SYS_DICTIONARYDATA sda
+        LEFT JOIN SYS_DICTIONARY sd ON sda.DICT_VALUE = sd.DICT_VALUE and sd.VALID ='1'
+        WHERE 1=1
+        <if test="dto.dictValue != null and dto.dictValue != '' ">AND sda.DICT_VALUE = #{dto.dictValue}</if>
+        <if test="dto.dictDataName != null and dto.dictDataName != '' ">AND sda.DICTDATA_NAME = #{dto.dictDataName}</if>
+        <if test="dto.dictDataValue != null and dto.dictDataValue != '' ">AND sda.DICTDATA_VALUE =
+            #{dto.dictDataValue}
+        </if>
+        <if test="dto.valid != null and dto.valid != ''">AND sda.VALID = #{dto.valid}</if>
+    </select>
+
+    <select id="query" resultMap="sysDictionaryDataMap2"
+            parameterType="com.justgo.admin.entity.SysDictionaryData">
+        SELECT sda.*,sd.DICT_NAME,sd.DICT_DESC FROM SYS_DICTIONARYDATA sda
+        LEFT JOIN SYS_DICTIONARY sd ON sda.DICT_VALUE = sd.DICT_VALUE and sd.VALID ='1'
+        WHERE 1=1
+        <if test="dto.dictValue != null and dto.dictValue != '' ">AND sda.DICT_VALUE like
+            CONCAT('%',#{dto.dictValue},'%')
+        </if>
+        <if test="dto.dictDataName != null and dto.dictDataName != '' ">AND sda.DICTDATA_NAME like
+            CONCAT('%',#{dto.dictDataName},'%')
+        </if>
+        <if test="dto.dictDataValue != null and dto.dictDataValue != '' ">AND sda.DICTDATA_VALUE =
+            #{dto.dictDataValue}
+        </if>
+        <if test="dto.dictDataDesc != null and dto.dictDataDesc != ''">AND sda.DICTDATA_DESC like
+            CONCAT('%',#{dto.dictDataDesc},'%')
+        </if>
+        <if test="dto.valid != null and dto.valid != ''">AND sda.VALID = #{dto.valid}</if>
+        ORDER BY sda.CREATED DESC
+        LIMIT #{beginNum},#{rowNum}
+    </select>
+
+    <select id="count" resultType="int" parameterType="com.justgo.admin.entity.SysDictionaryData">
+        SELECT
+        COUNT(*)
+        FROM SYS_DICTIONARYDATA sda
+        LEFT JOIN SYS_DICTIONARY sd ON sda.DICT_VALUE = sd.DICT_VALUE and sd.VALID ='1'
+        WHERE
+        1=1
+        <if test="dto.dictValue != null and dto.dictValue != '' ">AND sda.DICT_VALUE like
+            CONCAT('%',#{dto.dictValue},'%')
+        </if>
+        <if test="dto.dictDataName != null and dto.dictDataName != '' ">AND sda.DICTDATA_NAME like
+            CONCAT('%',#{dto.dictDataName},'%')
+        </if>
+        <if test="dto.dictDataValue != null and dto.dictDataValue != '' ">AND sda.DICTDATA_VALUE =
+            #{dto.dictDataValue}
+        </if>
+        <if test="dto.dictDataDesc != null and dto.dictDataDesc != ''">AND sda.DICTDATA_DESC like
+            CONCAT('%',#{dto.dictDataDesc},'%')
+        </if>
+        <if test="dto.valid != null and dto.valid != ''">AND sda.VALID = #{dto.valid}</if>
+    </select>
+
+    <!--OR条件类型查询-->
+    <select id="queryForOr" resultMap="sysDictionaryDataMap"
+            parameterType="com.justgo.admin.entity.SysDictionaryData">
+        SELECT sda.* FROM SYS_DICTIONARYDATA sda
+        LEFT JOIN SYS_DICTIONARY sd ON sda.DICT_VALUE = sd.DICT_VALUE and sd.VALID ='1'
+        WHERE
+        1=0
+        <if test="dto.id != null and dto.id != '' ">OR sda.ID = #{dto.id}</if>
+        <if test="dto.dictDataName != null and dto.dictDataName != '' ">OR sda.DICTDATA_NAME = #{dto.dictDataName} AND
+            sda.DICT_VALUE = #{dto.dictValue}
+        </if>
+        ORDER BY sda.CREATED DESC
+        LIMIT #{beginNum},#{rowNum}
+    </select>
+
+
+</mapper>
