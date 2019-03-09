@@ -1,0 +1,26 @@
+.btn-width{width: 82px;margin-right: 8px;}
+.impower-group-lf {float: left;height: 350px;width: 45%;}
+.impower-group-rg {float: right;height: 350px;width: 45%;}
+.treeview {border: 1px solid #ddd;border-radius: 4px;max-height: 200px;overflow: auto;}
+.treeview .list-group-item {border-bottom: 1px solid #ddd;border-left: 0;border-right:0;border-top:0;font-size: 13px;padding: 8px 14px;}
+.list-group {margin-bottom: 20px;padding-left: 0;}
+.impower-text {margin-bottom: 30px;overflow: hidden;}
+.impower-center {text-align: center;}
+.impower-button {margin-top: 75px;text-align: center;}
+.impower-center button {width: 100px;}
+.btn-success {background-color: #5cb85c;border-color: #4cae4c;color: #fff;}
+.impower-button button {height: 40px;margin-bottom: 8px;width: 280px;}
+.navbar-form-custom {float: left; margin-left:20px;height: 50px;padding: 0;width: 400px;display: inline-table;}
+.navbar-form-custom h2{margin: 0;padding-top: 15px;font-size: 22px;}
+
+/*轮播图配置*/
+.fileStyle{padding: 3px 6px;font-size: 14px;width:100%;border: 1px solid #ddd;}
+#preview{width:284px;height:140px;border:1px solid #ddd;overflow:hidden;padding: 2px;background: url(../img/image.png)no-repeat center center;}
+#imghead {filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=image);}
+.body_float p{color: #333333;margin-bottom: 25px;}
+.body_float_img{margin: 108px auto 0;height: 100px;width:220px;background-color: #1392E9;overflow:hidden;}
+.imgPic{width:220px;height: 110px;}
+#imgform label,#editForm label{font-weight: normal;}
+
+
+

@@ -1,0 +1,29 @@
+*{margin: 0;padding: 0;box-sizing: border-box;-webkit-box-sizing:border-box;}
+html{font-size: 625%;height: 100%;}
+img{width: 100%;height: auto;border: 0;vertical-align: middle;}
+a:focus,button:focus,.login-form input:focus {outline:none;}
+body {height:100%;font-size:0.16rem;font-family: "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei UI", "Microsoft YaHei", SimHei, "\5B8B\4F53", simsun, sans-serif;}
+.login{height: 100%;margin: 0 auto;position: relative;}
+.login-bg{height: 100%;}
+.login-bg div:first-child{width: 33%;height:100%;float: left;background-color: #D7FAF5;}
+.login-bg div:nth-child(2){width: 34%;height:100%;float: left;}
+.login-bg div:nth-child(2) img{width: 100%;height: 100%;}
+.login-bg div:nth-child(3){width: 33%;height:100%;float: left;background-color: #CEF2ED;}
+.login-layout{width:8rem;height:5.5rem;position: absolute;left: 0;right: 0;margin: auto;top: 0;bottom:0;background: url(../img/login_img.png)no-repeat center center;}
+.login-form{width: 50%;height:100%;float: right;padding: 1.2rem 1rem 0 0.3rem;}
+.login-form h3{font-size: 0.18rem;color: #888;margin: 0.2rem 0 0.3rem 0.3rem;font-weight: 400;text-align: center;}
+.login-form input{height: 0.38rem;width: 2rem;font-size: 0.15rem;border: 0;}
+.login-form-put{height: 0.5rem;border-bottom:0.01rem solid #aaa;padding:0.1rem 0 0 0.4rem;margin:0 0 0.1rem 0.3rem;background: url(../img/icon_name.png)no-repeat left 0.2rem;}
+.login-form-pass{height: 0.5rem;border-bottom:0.01rem solid #aaa;padding:0.1rem 0 0 0.4rem;margin:0 0 0.25rem 0.3rem;background: url(../img/icon_pss.png)no-repeat left 0.2rem;}
+.login-form-btn{width: 2.95rem;height: 1.08rem;background: url(../img/login_btn.png) no-repeat;border: 0;color: white;cursor: pointer;}
+.login-err{margin-left:0.3rem;color: red;font-size: 0.14rem;}
+
+
+
+
+
+
+
+
+
+
